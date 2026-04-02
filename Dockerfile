@@ -11,13 +11,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-# Create .env
-RUN cp .env.example .env || true
-
-# Install dependencies (IGNORE platform issues)
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-# Generate key
+# Generate key (safe)
 RUN php artisan key:generate || true
+
+# ❌ REMOVE config cache from build
+# ❌ REMOVE .env copy
 
 CMD php artisan serve --host=0.0.0.0 --port=10000

@@ -1,21 +1,21 @@
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 WORKDIR /var/www
 
 RUN apt-get update && apt-get install -y \
-    git unzip curl libzip-dev zip libpq-dev \
-    && docker-php-ext-install zip pdo pdo_pgsql
+    git unzip curl libzip-dev zip libpq-dev libicu-dev \
+    && docker-php-ext-install zip pdo pdo_pgsql intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-# Create dummy .env (IMPORTANT FIX)
+# Create .env
 RUN cp .env.example .env || true
 
-# Install dependencies WITHOUT scripts (FIX)
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Install dependencies (IGNORE platform issues)
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
 # Generate key
 RUN php artisan key:generate || true

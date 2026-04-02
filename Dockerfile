@@ -19,5 +19,6 @@ RUN php artisan key:generate || true
 
 # ❌ REMOVE config cache from build
 # ❌ REMOVE .env copy
+ENV DB_CONNECTION=pgsql
 
 CMD php artisan serve --host=0.0.0.0 --port=10000

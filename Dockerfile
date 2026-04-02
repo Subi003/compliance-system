@@ -4,7 +4,7 @@ WORKDIR /var/www
 
 RUN apt-get update && apt-get install -y \
     git unzip curl libzip-dev zip \
-    libpq-dev \   # ✅ IMPORTANT FIX
+    libpq-dev \
     && docker-php-ext-install zip pdo pdo_pgsql
 
 COPY . .

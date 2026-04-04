@@ -17,6 +17,8 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 # Generate key (safe)
 RUN php artisan key:generate || true
 
+CMD php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=10000
+
 # ❌ REMOVE config cache from build
 # ❌ REMOVE .env copy
 ENV DB_CONNECTION=pgsql

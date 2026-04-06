@@ -10,9 +10,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-# ✅ THIS IS IMPORTANT
-RUN touch .env
+# ✅ CREATE .env FILE (CRITICAL FIX)
+RUN cp .env.example .env
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+
+# ❌ REMOVE OLD CACHE
+RUN rm -f bootstrap/cache/config.php
 
 CMD php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=10000

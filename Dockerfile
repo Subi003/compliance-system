@@ -23,4 +23,4 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 RUN rm -f bootstrap/cache/config.php
 
 # FINAL START COMMAND
-CMD php artisan key:generate && php artisan migrate --force && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan key:generate --force && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000

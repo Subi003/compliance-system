@@ -2,20 +2,25 @@ FROM php:8.3-cli
 
 WORKDIR /var/www
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git unzip curl libzip-dev zip libpq-dev libicu-dev \
     && docker-php-ext-install zip pdo pdo_pgsql intl
 
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Copy project
 COPY . .
 
-# ✅ CREATE .env FILE (CRITICAL FIX)
+# Create .env from example
 RUN cp .env.example .env
 
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-# ❌ REMOVE OLD CACHE
+# Remove old config cache
 RUN rm -f bootstrap/cache/config.php
 
-CMD php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=10000
+# FINAL START COMMAND
+CMD php artisan key:generate && php artisan migrate --force && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000

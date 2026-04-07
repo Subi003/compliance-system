@@ -22,5 +22,7 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 # Remove old config cache
 RUN rm -f bootstrap/cache/config.php
 
+RUN php artisan migrate --force || true
+
 # FINAL START COMMAND
 CMD php artisan key:generate --force && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000

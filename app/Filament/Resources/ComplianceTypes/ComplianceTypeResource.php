@@ -8,7 +8,7 @@ use App\Filament\Resources\ComplianceTypes\Pages\ListComplianceTypes;
 use App\Filament\Resources\ComplianceTypes\Schemas\ComplianceTypeForm;
 use App\Filament\Resources\ComplianceTypes\Tables\ComplianceTypesTable;
 use App\Models\ComplianceType;
-use BackedEnum;
+use App\Models\UserPagePermission;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +18,11 @@ class ComplianceTypeResource extends Resource
 {
     protected static ?string $model = ComplianceType::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -32,19 +36,54 @@ class ComplianceTypeResource extends Resource
         return ComplianceTypesTable::configure($table);
     }
 
+    /**
+     * ComplianceTypes are global (not branch-specific).
+     * Access controlled purely by page permission + role.
+     */
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return UserPagePermission::canView($user->id, 'compliance-types');
+    }
+
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return UserPagePermission::canEdit($user->id, 'compliance-types');
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return UserPagePermission::canEdit($user->id, 'compliance-types');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return $user->hasRole('admin');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListComplianceTypes::route('/'),
+            'index'  => ListComplianceTypes::route('/'),
             'create' => CreateComplianceType::route('/create'),
-            'edit' => EditComplianceType::route('/{record}/edit'),
+            'edit'   => EditComplianceType::route('/{record}/edit'),
         ];
     }
 }

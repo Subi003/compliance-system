@@ -63,8 +63,8 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+            'driver' => 'plaintext',   // custom provider — compares passwords as plain text
+            'model'  => env('AUTH_MODEL', User::class),
         ],
 
         // 'users' => [

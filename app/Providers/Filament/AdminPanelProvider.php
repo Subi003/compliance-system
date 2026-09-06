@@ -2,8 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\RolesPage;
+use App\Filament\Pages\UserPermissionsPage;
+use App\Filament\Widgets\AccountWidget;
+use App\Filament\Widgets\BranchComplianceOverview;
+use App\Filament\Widgets\BranchStatsWidget;
 use Filament\Http\Middleware\Authenticate;
-use App\Filament\Resources\Branches\BranchResource;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -11,8 +15,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
+use Filament\Widgets\AccountWidget as FilamentAccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -29,21 +32,31 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+
+            // Auto-discover all Resources under app/Filament/Resources
+            ->discoverResources(
+                in: app_path('Filament/Resources'),
+                for: 'App\\Filament\\Resources'
+            )
+
             ->colors([
                 'primary' => Color::Amber,
             ])
+
+            // Explicit pages — Dashboard + our custom permissions page
             ->pages([
                 Dashboard::class,
+                UserPermissionsPage::class,
+                RolesPage::class,
             ])
-            ->resources([
-            BranchResource::class,
-            \App\Filament\Resources\Compliances\ComplianceResource::class,
-            ])
+
+            // Widgets registered explicitly (order controls dashboard sort)
             ->widgets([
-                \App\Filament\Widgets\ComplianceStats::class,
-                AccountWidget::class,
+                FilamentAccountWidget::class,
+                BranchStatsWidget::class,
+                BranchComplianceOverview::class,
             ])
+
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -10,11 +10,15 @@ class Branch extends Model
         'title',
         'location',
         'company_id',
-        'responsible',
-        'first_approver',
+        'responsible_id',
+        'first_approver_id',
+        'attachments',
     ];
 
-    // 🔥 YE ADD KARNA HAI
+    protected $casts = [
+        'attachments' => 'array',
+    ];
+
     public function compliances()
     {
         return $this->belongsToMany(\App\Models\Compliance::class);
@@ -23,5 +27,25 @@ class Branch extends Model
     public function company()
     {
         return $this->belongsTo(\App\Models\Company::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(\App\Models\User::class);
+    }
+
+    public function responsible()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'responsible_id');
+    }
+
+    public function firstApprover()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'first_approver_id');
+    }
+
+    public function complianceRecords()
+    {
+        return $this->hasMany(\App\Models\BranchComplianceRecord::class);
     }
 }

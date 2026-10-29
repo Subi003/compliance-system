@@ -18,9 +18,11 @@ return new class extends Migration
             $table->foreignId('compliance_id')->constrained()->cascadeOnDelete();
 
             $table->date('due_date')->nullable();
+            $table->date('from_date')->nullable();
+            $table->date('to_date')->nullable();
 
-            $table->enum('status', ['pending', 'approved', 'critical', 'process'])
-                ->default('pending');
+            $table->enum('status', ['pending', 'approved', 'critical', 'process', 'renewal'])
+                ->default('process');
 
             $table->boolean('renewal_due')->default(false);
 
